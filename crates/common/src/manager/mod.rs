@@ -38,7 +38,16 @@ impl ConfigManager {
         } else {
             match resource_id {
                 "spam-filter" => fetch_resource(DEFAULT_SPAMFILTER_URL, None).await,
-                "webadmin" => fetch_resource(DEFAULT_WEBADMIN_URL, None).await,
+                "webadmin" => {
+                    let webadmin_url = self.get("webadmin.url").await.map_err(|err| {
+                        format!("Failed to fetch configuration key 'webadmin.url': {err}",)
+                    })?;
+                    if let Some(url) = webadmin_url {
+                        fetch_resource(&url, None).await
+                    } else {
+                        fetch_resource(DEFAULT_WEBADMIN_URL, None).await
+                    }
+                }
                 _ => Err(format!("Unknown resource: {resource_id}")),
             }
         }
