@@ -15,6 +15,7 @@ use crate::{
             manage::{self, ManageDirectory, UpdatePrincipal},
             PrincipalField,
         },
+        ldap::DisplayableResultEntry,
         RcptType,
     },
     IntoError, Principal, QueryBy, Type, ROLE_ADMIN, ROLE_USER,
@@ -239,7 +240,7 @@ impl LdapDirectory {
             Details = filter,
             Result = rs
                 .iter()
-                .map(|e| trc::Value::from(format!("{e:?}")))
+                .map(|e| trc::Value::from(format!("{}", DisplayableResultEntry(e))))
                 .collect::<Vec<_>>()
         );
 
@@ -288,7 +289,8 @@ impl LdapDirectory {
                 trc::event!(
                     Store(trc::StoreEvent::LdapQuery),
                     Details = filter,
-                    Result = entry.map(|e| trc::Value::from(format!("{e:?}")))
+                    Result =
+                        entry.map(|e| trc::Value::from(format!("{}", DisplayableResultEntry(&e))))
                 );
 
                 result
@@ -342,7 +344,7 @@ impl LdapDirectory {
                 Details = filter.to_string(),
                 Result = rs
                     .iter()
-                    .map(|e| trc::Value::from(format!("{e:?}")))
+                    .map(|e| trc::Value::from(format!("{}", DisplayableResultEntry(e))))
                     .collect::<Vec<_>>()
             );
 
